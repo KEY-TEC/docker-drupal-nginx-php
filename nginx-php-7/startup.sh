@@ -1,10 +1,10 @@
 #!/bin/bash
 
-ENV_CONF=/etc/php5/fpm/pool.d/env.conf
+ENV_CONF=/etc/php/7.0/fpm/pool.d/env.conf
 
-echo "Configuring Nginx and PHP5-FPM with environment variables"
+echo "Configuring Nginx and PHP7-FPM with environment variables"
 
-# Update php5-fpm with access to Docker environment variables
+# Update php7-fpm with access to Docker environment variables
 echo '[www]' > $ENV_CONF
 for var in $(env | awk -F= '{print $1}')
 do
