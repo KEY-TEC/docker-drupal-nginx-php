@@ -1,6 +1,7 @@
 FROM ubuntu:15.10
 
 MAINTAINER Christian Wiedemann <christian.wiedemann@key-tec.de>
+MAINTAINER Daniel Redwig <daniel.redwig@key-tec.de>
 
 # Set timezone and locale.
 RUN locale-gen en_US.UTF-8
@@ -8,31 +9,46 @@ ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US:en
 ENV LC_ALL en_US.UTF-8
 
+ENV TERM xterm
+
 # Prevent services autoload (http://jpetazzo.github.io/2013/10/06/policy-rc-d-do-not-start-services-automatically/)
 RUN echo '#!/bin/sh\nexit 101' > /usr/sbin/policy-rc.d && chmod +x /usr/sbin/policy-rc.d
 RUN DEBIAN_FRONTEND=noninteractive apt-get update && apt-get -y install software-properties-common
 RUN DEBIAN_FRONTEND=noninteractive add-apt-repository ppa:ondrej/php && \
     DEBIAN_FRONTEND=noninteractive apt-get update && \
-    # Install packages
-    DEBIAN_FRONTEND=noninteractive \
-    apt-get -y install \
-    php7.0-fpm \
+    DEBIAN_FRONTEND=noninteractive apt-get -y install \
+    php7.0-common \
+    php7.0-cli \
     php7.0-mysql \
     php7.0-mcrypt \
     php7.0-curl \
-    php7.0-cli \
+    php7.0-mbstring \
     php7.0-gd \
     php7.0-sqlite \
-    php7.0-common \
-    php7.0-mbstring \
     php7.0-json \
+    php7.0-intl \
     php7.0-xml \
-    php-xdebug  \
+    php7.0-fpm
+
+# Basic packages
+RUN DEBIAN_FRONTEND=noninteractive apt-get -y --force-yes --no-install-recommends install \
+    zip unzip \
+    git \
+    vim \
+    nano \
+    curl \
     mysql-client \
+    pv \
+    openssh-client \
+    rsync \
+    apt-transport-https \
+    sudo \
+    locales \
     supervisor \
-    nginx && \
+    procps \
+     mc \
     # Cleanup
-    DEBIAN_FRONTEND=noninteractive apt-get clean && \
+    && DEBIAN_FRONTEND=noninteractive apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 #RUN php7enmod mcrypt
@@ -62,13 +78,30 @@ RUN \
     sed -i "/;listen.mode = 0666/c\listen.mode = 0666" /etc/php/7.0/fpm/pool.d/www.conf && \
     sed -i "/;daemonize = yes/c\daemonize = no" /etc/php/7.0/fpm/php-fpm.conf
 
+ENV DRUSH_VERSION 8.0.1
+# Composer
+RUN curl -sSL https://getcomposer.org/installer | php
+RUN mv composer.phar /usr/local/bin/composer
+
+    # Drush 8 (default)
+RUN curl -sSL https://github.com/drush-ops/drush/releases/download/$DRUSH_VERSION/drush.phar -o /root/drush.phar
+RUN mv /root/drush.phar /usr/local/bin/drush && \
+    chmod +x /usr/local/bin/drush
+
+ENV PATH /root/.composer/vendor/bin:$PATH
+
+# Set TERM so text editors/etc. can be used
+ENV TERM xterm
+
+ADD ./config/.ssh /root/.ssh
+ADD ./config/.drush /root/.drush
+ADD ./config/supervisor.conf /etc/supervisor/conf.d/supervisord.conf
 # Startup script
 # This startup script wll configure nginx
 ADD ./startup.sh /opt/startup.sh
 RUN chmod +x /opt/startup.sh
 
 RUN mkdir /run/php
-
 
 ADD ./config/index.php /var/www/drupal/index.php
 
@@ -78,5 +111,9 @@ RUN usermod -u 1000 www-data && \
 EXPOSE 80 443
 
 WORKDIR /var/www
+
+ENV SSH_KEY_NAME id_rsa
+# Starter script
+ENTRYPOINT ["/opt/startup.sh"]
 
 CMD /opt/startup.sh; /usr/bin/supervisord -n
