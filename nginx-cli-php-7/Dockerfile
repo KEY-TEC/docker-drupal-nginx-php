@@ -46,7 +46,8 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get -y --force-yes --no-install-recommend
     locales \
     supervisor \
     procps \
-     mc \
+    nginx \
+    mc \
     # Cleanup
     && DEBIAN_FRONTEND=noninteractive apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
@@ -113,7 +114,5 @@ EXPOSE 80 443
 WORKDIR /var/www
 
 ENV SSH_KEY_NAME id_rsa
-# Starter script
-ENTRYPOINT ["/opt/startup.sh"]
 
 CMD /opt/startup.sh; /usr/bin/supervisord -n
