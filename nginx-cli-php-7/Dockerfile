@@ -37,6 +37,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get -y --force-yes --no-install-recommend
     vim \
     nano \
     curl \
+    git \
     mysql-client \
     pv \
     openssh-client \
