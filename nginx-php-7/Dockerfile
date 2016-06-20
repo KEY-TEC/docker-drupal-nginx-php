@@ -27,6 +27,7 @@ RUN DEBIAN_FRONTEND=noninteractive add-apt-repository ppa:ondrej/php && \
     php7.0-common \
     php7.0-mbstring \
     php7.0-json \
+    php7.0-bcmath \
     php7.0-xml \
     php-xdebug  \
     mysql-client \
