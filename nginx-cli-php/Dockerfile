@@ -34,6 +34,7 @@ RUN \
     php-pear \
     php5-json \
     php5-memcache \
+    php5-bcmath \
     php5-xdebug  \
     mysql-client \
     supervisor \
