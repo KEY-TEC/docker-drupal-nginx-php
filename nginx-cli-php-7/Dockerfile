@@ -47,6 +47,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get -y --force-yes --no-install-recommend
     supervisor \
     procps \
     nginx \
+    sendmail \
     mc \
     # Cleanup
     && DEBIAN_FRONTEND=noninteractive apt-get clean && \
@@ -71,6 +72,7 @@ RUN \
     sed -i 's/memory_limit = .*/memory_limit = 196M/' /etc/php/7.0/fpm/php.ini && \
     sed -i 's/cgi.fix_pathinfo = .*/cgi.fix_pathinfo = 0/' /etc/php/7.0/fpm/php.ini && \
     sed -i 's/upload_max_filesize = .*/upload_max_filesize = 500M/' /etc/php/7.0/fpm/php.ini && \
+    sed -i 's/;sendmail_path =/sendmail_path = \/usr\/sbin\/sendmail -t -i/' /etc/php/7.0/fpm/php.ini && \
     sed -i 's/post_max_size = .*/post_max_size = 500M/' /etc/php/7.0/fpm/php.ini && \
     # PHP FPM config changes
     sed -i 's/listen = .*/listen = \/var\/run\/php7.0-fpm\.sock/' /etc/php/7.0/fpm/pool.d/www.conf && \
