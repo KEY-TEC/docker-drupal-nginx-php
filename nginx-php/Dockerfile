@@ -21,7 +21,7 @@ RUN \
     php5-mcrypt php5-curl php5-cli php5-gd php5-sqlite php5-common php-apc \
     php-pear php5-json php5-memcache php5-xdebug  \
     mysql-client supervisor \
-    nginx && \
+    nginx sendmail && \
     # Cleanup
     DEBIAN_FRONTEND=noninteractive apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
@@ -43,6 +43,7 @@ RUN \
     # PHP settings changes
     sed -i 's/memory_limit = .*/memory_limit = 196M/' /etc/php5/fpm/php.ini && \
     sed -i 's/memory_limit = .*/memory_limit = 196M/' /etc/php5/fpm/php.ini && \
+    sed -i 's/;sendmail_path =/sendmail_path = \/usr\/sbin\/sendmail -t -i/' /etc/php5/fpm/php.ini && \
     sed -i 's/cgi.fix_pathinfo = .*/cgi.fix_pathinfo = 0/' /etc/php5/fpm/php.ini && \
     sed -i 's/upload_max_filesize = .*/upload_max_filesize = 500M/' /etc/php5/fpm/php.ini && \
     sed -i 's/post_max_size = .*/post_max_size = 500M/' /etc/php5/fpm/php.ini && \
